@@ -1,3 +1,5 @@
+from axon.core.state import AppState
+
 class Application:
     """
     Main application class.
@@ -9,7 +11,8 @@ class Application:
 
     def __init__(self):
         self.running = False
-
+        self.state = AppState.CREATED
+        
     def run(self):
         self.running = True
 
@@ -22,3 +25,4 @@ class Application:
         print()
         print("✔ Core initialized.")
         print("✔ Ready.")
+        
