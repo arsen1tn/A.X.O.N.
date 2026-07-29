@@ -1,4 +1,5 @@
 from axon.core.state import AppState
+from axon.core.logger import logger
 
 class Application:
     """
@@ -19,7 +20,7 @@ class Application:
         print("=" * 50)
         print(f"A.X.O.N. v{self.VERSION}")
         print("=" * 50)
-        print("Initializing Core...")
+        logger.info("Initializing Core...")
         print("Loading Configuration...")
         print("Starting Services...")
         print()
