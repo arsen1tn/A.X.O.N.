@@ -1,5 +1,6 @@
 from axon.core.state import AppState
 from axon.core.logger import logger, setup_logger
+from axon.core.config import Config
 
 class Application:
     """
@@ -13,12 +14,13 @@ class Application:
     def __init__(self):
         self.running = False
         self.state = AppState.CREATED
+        self.config = Config()
         
     def run(self):
         self.running = True
         
         setup_logger()
-
+        self.config.load()
         logger.info("=" * 50)
         logger.info(f"A.X.O.N. v{self.VERSION}")
         logger.info("=" * 50)

@@ -1,0 +1,11 @@
+{
+    "application": {
+        "name": "A.X.O.N.",
+        "version": "0.1.0",
+        "language": "en"
+    },
+
+    "logging": {
+        "level": "INFO"
+    }
+}
