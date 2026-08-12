@@ -20,7 +20,12 @@ class Application:
         self.running = True
         
         setup_logger()
-        self.config.load()
+        
+        if not self.config.load():
+            logger.error("Failed to load configuration.")
+            
+            return
+        
         logger.info("=" * 50)
         logger.info(f"A.X.O.N. v{self.VERSION}")
         logger.info("=" * 50)

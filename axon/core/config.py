@@ -1,5 +1,7 @@
 import json
 from pathlib import Path
+from axon.core.logger import logger
+
 
 
 class Config:
@@ -13,9 +15,19 @@ class Config:
     def load(self):
         config_path = Path("config/config.json")
         
-        with config_path.open("r", encoding="utf-8") as file:
-            self.config = json.load(file)
-            
+        try:
+            with config_path.open("r", encoding="utf-8") as file:
+                self.config = json.load(file)
+            return True
+        
+        except FileNotFoundError:
+            logger.error("Configuration file not found.")
+            return False
+    
+        except json.JSONDecodeError:
+            logger.error("Configuration file contains invalid JSON.")
+            return False
+        
     def get(self, key, default=None):
         keys = key.split(".")
         value = self.config
