@@ -3,6 +3,8 @@ from axon.core.logger import logger, setup_logger
 from axon.core.config import Config
 from axon.core.lifecycle import Lifecycle
 from axon.core.server import BaseService
+from axon.core.events import EventBus
+from axon.core.context import ContextManager
 import time
 
 class Application:
@@ -20,8 +22,12 @@ class Application:
         self.config = Config()
         self.lifecycle = Lifecycle()
         self.services = []
+        self.events = EventBus()
+        self.context = ContextManager()
     
     def register_service(self, service: BaseService) -> None:
+        service.events = self.events
+        service.context = self.context
         self.services.append(service)
         logger.info(f"Registered service: {service.name}")
                
