@@ -30,11 +30,15 @@ class HybridProvider(BaseLLMProvider):
         
         if not is_complex_task:
             try:
+                print("🧠 [Ollama]")
                 return self.local_provider.generate(prompt)
             except Exception as e:
+                print("☁️ [Gemini]")
                 return self.cloud_provider.generate(prompt)
         else:
             try:
+                print("☁️ [Gemini]")
                 return self.cloud_provider.generate(prompt)
             except Exception as e:
+                print("🧠 [Ollama]")
                 return self.local_provider.generate(prompt)
