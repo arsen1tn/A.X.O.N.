@@ -3,13 +3,10 @@ from axon.core.dummy_service import DummyService
 from axon.core.logger import logger
 from axon.ai.ai_service import AIService
 from axon.ai.providers.openai_provider import OpenAIProvider
+from axon.ai.providers.hybrid_provider import HybridProvider
 
-provider = OpenAIProvider(
-    api_key="key",
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-    model="gemini-3.5-flash"
-)
-
+provider = HybridProvider(gemini_api_key="abcdefg")
+    
 def main():
     app = Application()
     app.register_service(AIService(provider=provider))
