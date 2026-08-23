@@ -2,7 +2,7 @@ from axon.core.state import AppState
 from axon.core.logger import logger, setup_logger
 from axon.core.config import Config
 from axon.core.lifecycle import Lifecycle
-from axon.core.server import BaseService
+from axon.core.service import BaseService
 from axon.core.events import EventBus
 from axon.core.context import ContextManager
 import time

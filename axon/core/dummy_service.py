@@ -1,5 +1,5 @@
 from axon.core.logger import logger
-from axon.core.server import BaseService
+from axon.core.service import BaseService
 
 
 class DummyService(BaseService):
@@ -19,7 +19,7 @@ class DummyService(BaseService):
             
         if hasattr(self, "events") and self.events:
                     self.events.subscribe("ping_event", self._on_ping)
-                    self.events.emit("ping_event", "Hello from DummyService!")
+                    self.events.emit("user_input", "Hello for AXON!")
                     
         return True
 
