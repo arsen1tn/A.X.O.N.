@@ -1,10 +1,12 @@
 from axon.core.logger import logger
 from axon.core.service import BaseService
+from axon.ai.providers.base import BaseLLMProvider
 
 class AIService(BaseService):
-    def __init__(self):
+    def __init__(self, provider: BaseLLMProvider):
         super().__init__(name="AIService")
-    
+        self.provider = provider
+        
     def start(self):
         self.is_running = True
         logger.info(f"Starting {self.name}")
@@ -24,4 +26,4 @@ class AIService(BaseService):
     
     def generate_response(self, prompt: str) -> str:
         logger.info(f"Generating response for: {prompt}")
-        return f"I'm not thinking yet"
+        return self.provider.generate(prompt)
