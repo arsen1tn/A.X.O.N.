@@ -112,9 +112,7 @@ Each module is independent, making the project easy to maintain and extend.
 ### AI
 
 - Ollama
-- llama.cpp
-- Transformers
-- OpenAI API *(optional)*
+- OpenAI API
 
 ### Speech
 
@@ -151,8 +149,8 @@ Each module is independent, making the project easy to maintain and extend.
 ## Phase 1 — Core
 
 - [x] Project architecture
-- [ ] Configuration system
-- [ ] Logging
+- [x] Configuration system
+- [x] Logging
 - [ ] Plugin framework
 
 ## Phase 2 — Voice
@@ -163,7 +161,8 @@ Each module is independent, making the project easy to maintain and extend.
 
 ## Phase 3 — Intelligence
 
-- [ ] Local LLM
+- [x] Local LLM
+- [x] Cloud AI
 - [ ] Context manager
 - [ ] Long-term memory
 
