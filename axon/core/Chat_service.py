@@ -2,8 +2,9 @@ from axon.ai.ai_service import AIService
 from axon.core.logger import logger
 
 class Chat_service:
-    def __init__(self, ai_service: AIService):
+    def __init__(self, ai_service: AIService, app):
         self.ai_service = ai_service
+        self.app = app
         self.name = "ChatService"
         self.is_running = False
         
@@ -19,6 +20,7 @@ class Chat_service:
                 user_input = input("User: ")
                 if user_input.lower() in ["exit", "quit"]:
                     logger.info("Exiting chat service.")
+                    self.app.stop()
                     break
                         
                 response = self.ai_service.generate_response(user_input)

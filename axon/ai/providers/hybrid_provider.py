@@ -3,7 +3,7 @@ from axon.ai.providers.openai_provider import OpenAIProvider
 
 class HybridProvider(BaseLLMProvider):
     def __init__(self, gemini_api_key: str):
-        self.local_provider = OpenAIProvider(api_key="ollama", base_url="http://localhost:11434/v1", model="llama3.2:3b")
+        self.local_provider = OpenAIProvider(api_key="ollama", base_url="http://localhost:11434/v1", model="qwen2.5:3b")
         self.cloud_provider = OpenAIProvider(api_key=gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/", model="gemini-3.5-flash")
         
     def _is_complex(self, prompt: str) -> bool:
@@ -14,7 +14,7 @@ class HybridProvider(BaseLLMProvider):
             "code", "write", "program", "algorithm", "analysis", "compare", "explain", "solve", "create",
         ]
         
-        if len(prompt) > 250:
+        if len(prompt) > 100:
             return True
             
         prompt_lower = prompt.lower()
