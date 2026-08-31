@@ -151,7 +151,7 @@ Each module is independent, making the project easy to maintain and extend.
 - [x] Project architecture
 - [x] Configuration system
 - [x] Logging
-- [ ] Plugin framework
+- [x] Plugin framework
 
 ## Phase 2 — Voice
 
@@ -163,6 +163,7 @@ Each module is independent, making the project easy to maintain and extend.
 
 - [x] Local LLM
 - [x] Cloud AI
+- [x] Hybrid AI
 - [ ] Context manager
 - [ ] Long-term memory
 
