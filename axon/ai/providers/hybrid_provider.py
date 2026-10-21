@@ -25,18 +25,15 @@ class HybridProvider(BaseLLMProvider):
                 return True
                 
         return False
+    def _has_internet(self) -> bool:
+        try:
+            socket.create_connection(("8.8.8.8", 53), timeout=2)
+            return True
+        except OSError:
+            return False
     
     def generate(self, prompt: str) -> str:
-        is_complex_task = self._is_complex(prompt)
-        
-        if not is_complex_task:
-            try:
-                print("🧠 [Ollama]")
-                return self.local_provider.generate(prompt)
-            except Exception as e:
-                print("☁️ [Gemini]")
-                return self.cloud_provider.generate(prompt)
-        else:
+        if self._has_internet() or self._is_complex(prompt):
             try:
                 print("☁️ [Gemini]")
                 return self.cloud_provider.generate(prompt)
@@ -44,6 +41,6 @@ class HybridProvider(BaseLLMProvider):
                 print(e)
                 print("🧠 [Ollama]")
                 return self.local_provider.generate(prompt)
-            else:
-                print("🧠 [Ollama]")
-                return self.local_provider.generate(prompt)
+        else:
+            print("🧠 [Ollama]")
+            return self.local_provider.generate(prompt)

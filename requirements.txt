@@ -2,3 +2,4 @@ openai
 ollama
 qwen2.5:3b
 fastapi uvicorn
+pydantic

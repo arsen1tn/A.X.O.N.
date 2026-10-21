@@ -6,7 +6,7 @@ from axon.ai.providers.openai_provider import OpenAIProvider
 from axon.ai.providers.hybrid_provider import HybridProvider
 from axon.services.web_service import WebService
 
-provider = HybridProvider(gemini_api_key="abc123")
+provider = HybridProvider(gemini_api_key="YOUR_GEMINI_API_KEY")
 ai_service = AIService(provider=provider)
 
 def main():
