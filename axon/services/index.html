@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <title>A.X.O.N. Chat</title>
+</head>
+<body>
+  <h1>A.X.O.N. Chat</h1>
+<div id="chat"></div>
+<input id="input" type="text" placeholder="Write to A.X.O.N.">
+<button id="send">Send</button>
+
+<script>
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
+  const send = document.getElementById("send");
+
+  async function sendMessage() {
+    const text = input.value;
+    if (!text) return;
+
+    chat.innerHTML += "<p>You: " + text + "</p>";
+    input.value = "";
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await response.json();
+      console.log(response.status, data);
+
+      if (response.ok) {
+        chat.innerHTML += "<p>AXON: " + data.response + "</p>";
+      } else {
+        chat.innerHTML += "<p>Error " + response.status + ": " + JSON.stringify(data) + "</p>";
+      }
+    } catch (err) {
+      chat.innerHTML += "<p>Connection error: " + err + "</p>";
+    }
+  }
+
+  send.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+</body>
+</html>
