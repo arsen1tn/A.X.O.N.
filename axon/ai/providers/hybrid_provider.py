@@ -4,9 +4,11 @@ import socket
 
 class HybridProvider(BaseLLMProvider):
     def __init__(self, gemini_api_key: str):
+        base = "https://generativelanguage.googleapis.com/v1beta/openai/"
         self.local_provider = OpenAIProvider(api_key="ollama", base_url="http://localhost:11434/v1", model="qwen2.5:3b")
-        self.cloud_provider = OpenAIProvider(api_key=gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/", model="gemini-3.8-flash")
-        
+        self.fast_provider = OpenAIProvider(api_key=gemini_api_key, base_url=base, model="gemini-3.5-flash-lite", reasoning_effort="low")
+        self.smart_provider = OpenAIProvider(api_key=gemini_api_key, base_url=base, model="gemini-3.5-flash", reasoning_effort="medium")
+    
     def _is_complex(self, prompt: str) -> bool:
         complex_keywords = [
             # Русский
@@ -33,10 +35,13 @@ class HybridProvider(BaseLLMProvider):
             return False
     
     def generate(self, prompt: str) -> str:
-        if self._has_internet() or self._is_complex(prompt):
+        complex_prompt = self._is_complex(prompt)
+        cloud = self.smart_provider if complex_prompt else self.fast_provider
+
+        if self._has_internet() or complex_prompt:
             try:
-                print("☁️ [Gemini]")
-                return self.cloud_provider.generate(prompt)
+                print(f"☁️ [Gemini] {cloud.model}")
+                return cloud.generate(prompt)
             except Exception as e:
                 print(e)
                 print("🧠 [Ollama]")
