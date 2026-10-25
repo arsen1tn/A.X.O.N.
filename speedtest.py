@@ -3,7 +3,7 @@ import time
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="hjfj",
+    api_key="abs",
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
     timeout=30,
     max_retries=0,
