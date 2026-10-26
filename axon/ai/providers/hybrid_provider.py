@@ -2,6 +2,8 @@ from axon.ai.providers.base import BaseLLMProvider
 from axon.ai.providers.openai_provider import OpenAIProvider
 import socket
 
+from axon.core.logger import logger
+
 class HybridProvider(BaseLLMProvider):
     def __init__(self, gemini_api_key: str):
         base = "https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -34,18 +36,12 @@ class HybridProvider(BaseLLMProvider):
         except OSError:
             return False
     
-    def generate(self, prompt: str) -> str:
-        complex_prompt = self._is_complex(prompt)
-        cloud = self.smart_provider if complex_prompt else self.fast_provider
-
-        if self._has_internet() or complex_prompt:
+    def generate(self, prompt, history=None):
+        if self._has_internet():
+            provider = self.smart_provider if self._is_complex(prompt) else self.fast_provider
             try:
-                print(f"☁️ [Gemini] {cloud.model}")
-                return cloud.generate(prompt)
+                return provider.generate(prompt, history=history)
             except Exception as e:
-                print(e)
-                print("🧠 [Ollama]")
-                return self.local_provider.generate(prompt)
-        else:
-            print("🧠 [Ollama]")
-            return self.local_provider.generate(prompt)
+                logger.warning(f"Cloud provider failed, falling back to local: {e}")
+
+        return self.local_provider.generate(prompt, history=history)

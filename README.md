@@ -164,8 +164,8 @@ Each module is independent, making the project easy to maintain and extend.
 - [x] Local LLM
 - [x] Cloud AI
 - [x] Hybrid AI
-- [ ] Context manager
-- [ ] Long-term memory
+- [x] Context manager
+- [x] Long-term memory
 
 ## Phase 4 — System
 

@@ -4,8 +4,9 @@ from axon.core.config import Config
 from axon.core.lifecycle import Lifecycle
 from axon.core.service import BaseService
 from axon.core.events import EventBus
-from axon.core.context import ContextManager
+from axon.core.context_manager import ContextManager
 import time
+from axon.memory.memory_store import MemoryStore
 
 class Application:
     """
@@ -23,7 +24,7 @@ class Application:
         self.lifecycle = Lifecycle()
         self.services = []
         self.events = EventBus()
-        self.context = ContextManager()
+        self.context = ContextManager(store=MemoryStore())
     
     def register_service(self, service: BaseService) -> None:
         service.events = self.events

@@ -4,5 +4,5 @@ class BaseLLMProvider(ABC):
     
    @abstractmethod
    
-   def generate(self, prompt: str) -> str:
+   def generate(self, prompt: str, history=None) -> str:
             pass

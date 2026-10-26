@@ -7,7 +7,7 @@ from axon.services.web_service import WebService
 from axon.skills.skill_manager import SkillManager
 
 
-provider = HybridProvider(gemini_api_key="abs")
+provider = HybridProvider(gemini_api_key="000")
 ai_service = AIService(provider=provider)
 
 def main():

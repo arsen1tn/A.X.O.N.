@@ -38,19 +38,24 @@ class WebService:
             return FileResponse(HTML_FILE_PATH)
  
         @self.app.post("/api/chat")
-        async def chat_endpoint(chat_message: ChatMessage):
-            try:
-                logger.info(f"User: {chat_message.message}")
- 
-                response = self.skill_manager.handle(chat_message.message)
-                if response is None:
-                    response = self.hybrid_provider.generate(chat_message.message)
- 
-                logger.info(f"AXON: {response}")
-                return {"response": response}
-            except Exception as e:
-                logger.error(f"Web Service Error: {e}")
-                raise HTTPException(status_code=500, detail="Internal Server Error")
+        async def chat_endpoint(request: ChatMessage):
+            message = request.message
+            logger.info(f"User: {message}")
+
+            skill_reply = self.skill_manager.handle(message)
+            if skill_reply is not None:
+                logger.info(f"AXON (skill): {skill_reply}")
+                return {"response": skill_reply}
+
+            self.context.add_message("user", message)
+            history = self.context.get_history()
+
+            reply = self.hybrid_provider.generate(message, history=history)
+
+            self.context.add_message("assistant", reply)
+            logger.info(f"AXON: {reply}")
+
+            return {"response": reply}
  
     def run(self):
         config = uvicorn.Config(
