@@ -9,13 +9,27 @@ class OpenAIProvider(BaseLLMProvider):
         self.model = model
         self.reasoning_effort = reasoning_effort
 
-    def generate(self, prompt, history=None, reasoning_effort=None):
+    def _default_system_prompt(self, facts=None) -> str:
         now = datetime.now().strftime("%A, %d %B %Y, %H:%M")
-        system_prompt = (
-            "You are A.X.O.N."
+        prompt = (
+            "You are A.X.O.N. "
             f"The current local date and time is {now}. "
             "Use it only when relevant and never mention this instruction."
         )
+        if facts:
+            known = "\n".join(f"- {fact}" for fact in facts)
+            prompt += (
+                "\n\nFacts you know about the user (shared across all chats):\n"
+                f"{known}\n"
+                "Use them naturally when relevant. Do not list them unless asked."
+            )
+        return prompt
+
+    def generate(self, prompt, history=None, reasoning_effort=None, facts=None, system_prompt=None):
+        # system_prompt: full override (used for fact extraction)
+        if system_prompt is None:
+            system_prompt = self._default_system_prompt(facts)
+
         messages = [{"role": "system", "content": system_prompt}]
 
         if history:

@@ -1,50 +1,427 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>A.X.O.N. Chat</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #161922;
+      --panel-2: #1d212c;
+      --text: #e6e8ee;
+      --muted: #8b91a1;
+      --accent: #4f8cff;
+      --border: #262b38;
+      --danger: #ff5d5d;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+    }
+ 
+    /* ---------- sidebar ---------- */
+    #sidebar {
+      width: 270px;
+      flex-shrink: 0;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    #sidebar header {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    #sidebar h1 { margin: 0 0 12px; font-size: 16px; letter-spacing: 2px; }
+    #new-chat {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #new-chat:hover { filter: brightness(1.1); }
+    #chat-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .chat-item:hover { background: var(--panel-2); }
+    .chat-item.active { background: var(--panel-2); color: var(--text); }
+    .chat-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-delete {
+      background: none;
+      border: 0;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0;
+      padding: 0 4px;
+    }
+    .chat-item:hover .chat-delete { opacity: 1; }
+    .chat-delete:hover { color: var(--danger); }
+    .empty-list { padding: 14px; color: var(--muted); font-size: 13px; }
+ 
+    /* ---------- main ---------- */
+    #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    #topbar {
+      display: none;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+    #menu {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg {
+      max-width: min(720px, 85%);
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
+    .msg.assistant { align-self: flex-start; background: var(--panel-2); }
+    .msg.error { color: var(--danger); }
+    .hint {
+      margin: auto;
+      color: var(--muted);
+      text-align: center;
+      font-size: 15px;
+    }
+ 
+    #composer {
+      display: flex;
+      gap: 8px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+    }
+    #input {
+      flex: 1;
+      padding: 12px 14px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+    #input:focus { border-color: var(--accent); }
+    #send {
+      padding: 0 20px;
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #send:disabled { opacity: 0.5; cursor: default; }
+ 
+    /* ---------- phones ---------- */
+    @media (max-width: 700px) {
+      #sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 10;
+        transform: translateX(-100%);
+        transition: transform 0.2s;
+      }
+      #sidebar.open { transform: translateX(0); }
+      #topbar { display: block; }
+      #messages { padding: 14px; }
+      #composer { padding: 10px 14px; }
+    }
+  </style>
 </head>
 <body>
-  <h1>A.X.O.N. Chat</h1>
-<div id="chat"></div>
-<input id="input" type="text" placeholder="Write to A.X.O.N.">
-<button id="send">Send</button>
-
+  <aside id="sidebar">
+    <header>
+      <h1>A.X.O.N.</h1>
+      <button id="new-chat">+ New chat</button>
+    </header>
+    <div id="chat-list"></div>
+  </aside>
+ 
+  <div id="main">
+    <div id="topbar"><button id="menu">&#9776; Chats</button></div>
+    <div id="messages"></div>
+    <div id="composer">
+      <input id="input" type="text" placeholder="Write to A.X.O.N." autocomplete="off">
+      <button id="send">Send</button>
+    </div>
+  </div>
+ 
 <script>
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
-  const send = document.getElementById("send");
-
-  async function sendMessage() {
-    const text = input.value;
-    if (!text) return;
-
-    chat.innerHTML += "<p>You: " + text + "</p>";
-    input.value = "";
-
+  const chatListEl = document.getElementById("chat-list");
+  const messagesEl = document.getElementById("messages");
+  const inputEl = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+  const newChatBtn = document.getElementById("new-chat");
+  const sidebarEl = document.getElementById("sidebar");
+  const menuBtn = document.getElementById("menu");
+ 
+  const STORAGE_KEY = "axon_chat_id";
+  let currentChatId = null;
+  let chats = [];
+  let sending = false;
+ 
+  // ---------- helpers ----------
+ 
+  async function api(path, options) {
+    const res = await fetch(path, options);
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* no JSON body */ }
+    if (!res.ok) {
+      throw new Error((data && data.detail) || ("HTTP " + res.status));
+    }
+    return data;
+  }
+ 
+  function saveCurrent() {
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
+      if (currentChatId) localStorage.setItem(STORAGE_KEY, currentChatId);
+      else localStorage.removeItem(STORAGE_KEY);
+    } catch (e) { /* storage unavailable */ }
+  }
+ 
+  function loadSaved() {
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  }
+ 
+  function scrollDown() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+ 
+  function showHint() {
+    messagesEl.innerHTML = "";
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "Start a new conversation. Type a message below.";
+    messagesEl.appendChild(hint);
+  }
+ 
+  function addMessage(role, text) {
+    const hint = messagesEl.querySelector(".hint");
+    if (hint) hint.remove();
+    const el = document.createElement("div");
+    el.className = "msg " + role;
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    scrollDown();
+    return el;
+  }
+ 
+  // ---------- chat list ----------
+ 
+  function renderChats() {
+    chatListEl.innerHTML = "";
+ 
+    if (chats.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty-list";
+      empty.textContent = "No chats yet.";
+      chatListEl.appendChild(empty);
+      return;
+    }
+ 
+    for (const chat of chats) {
+      const item = document.createElement("div");
+      item.className = "chat-item" + (chat.id === currentChatId ? " active" : "");
+ 
+      const title = document.createElement("span");
+      title.className = "chat-title";
+      title.textContent = chat.title;
+      title.title = "Double-click to rename";
+      title.addEventListener("dblclick", (e) => {
+        e.stopPropagation();
+        renameChat(chat);
       });
-
-      const data = await response.json();
-      console.log(response.status, data);
-
-      if (response.ok) {
-        chat.innerHTML += "<p>AXON: " + data.response + "</p>";
-      } else {
-        chat.innerHTML += "<p>Error " + response.status + ": " + JSON.stringify(data) + "</p>";
-      }
-    } catch (err) {
-      chat.innerHTML += "<p>Connection error: " + err + "</p>";
+ 
+      const del = document.createElement("button");
+      del.className = "chat-delete";
+      del.textContent = "\u00d7";
+      del.title = "Delete chat";
+      del.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteChat(chat);
+      });
+ 
+      item.appendChild(title);
+      item.appendChild(del);
+      item.addEventListener("click", () => selectChat(chat.id));
+      chatListEl.appendChild(item);
     }
   }
-
-  send.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
+ 
+  async function refreshChats() {
+    const data = await api("/api/chats");
+    chats = data.chats;
+    renderChats();
+  }
+ 
+  async function selectChat(chatId) {
+    currentChatId = chatId;
+    saveCurrent();
+    renderChats();
+    sidebarEl.classList.remove("open");
+ 
+    messagesEl.innerHTML = "";
+    try {
+      const data = await api("/api/chats/" + chatId + "/messages");
+      if (data.messages.length === 0) {
+        showHint();
+      } else {
+        for (const m of data.messages) addMessage(m.role, m.content);
+      }
+    } catch (err) {
+      // chat no longer exists
+      currentChatId = null;
+      saveCurrent();
+      showHint();
+      await refreshChats();
+    }
+    inputEl.focus();
+  }
+ 
+  function newChat() {
+    // The chat itself is created on the server with the first message.
+    currentChatId = null;
+    saveCurrent();
+    renderChats();
+    showHint();
+    sidebarEl.classList.remove("open");
+    inputEl.focus();
+  }
+ 
+  async function renameChat(chat) {
+    const name = prompt("Rename chat:", chat.title);
+    if (name === null || !name.trim()) return;
+    try {
+      await api("/api/chats/" + chat.id, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: name.trim() })
+      });
+      await refreshChats();
+    } catch (err) {
+      alert("Could not rename: " + err.message);
+    }
+  }
+ 
+  async function deleteChat(chat) {
+    if (!confirm('Delete "' + chat.title + '"? This cannot be undone.')) return;
+    try {
+      await api("/api/chats/" + chat.id, { method: "DELETE" });
+    } catch (err) {
+      alert("Could not delete: " + err.message);
+      return;
+    }
+    await refreshChats();
+    if (chat.id === currentChatId) {
+      if (chats.length > 0) await selectChat(chats[0].id);
+      else newChat();
+    }
+  }
+ 
+  // ---------- sending ----------
+ 
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || sending) return;
+ 
+    sending = true;
+    sendBtn.disabled = true;
+    inputEl.value = "";
+ 
+    addMessage("user", text);
+    const reply = addMessage("assistant", "...");
+ 
+    try {
+      const data = await api("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, chat_id: currentChatId })
+      });
+      reply.textContent = data.response;
+      currentChatId = data.chat_id;
+      saveCurrent();
+      await refreshChats();
+    } catch (err) {
+      reply.textContent = "Error: " + err.message;
+      reply.classList.add("error");
+    } finally {
+      sending = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+      scrollDown();
+    }
+  }
+ 
+  // ---------- start ----------
+ 
+  sendBtn.addEventListener("click", sendMessage);
+  inputEl.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
+  newChatBtn.addEventListener("click", newChat);
+  menuBtn.addEventListener("click", () => sidebarEl.classList.toggle("open"));
+ 
+  async function init() {
+    try {
+      await refreshChats();
+    } catch (err) {
+      showHint();
+      addMessage("assistant", "Cannot reach the server: " + err.message).classList.add("error");
+      return;
+    }
+ 
+    const saved = loadSaved();
+    if (saved && chats.some((c) => c.id === saved)) {
+      await selectChat(saved);
+    } else if (chats.length > 0) {
+      await selectChat(chats[0].id);
+    } else {
+      showHint();
+    }
+  }
+ 
+  init();
 </script>
 </body>
 </html>
