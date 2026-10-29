@@ -1,5 +1,6 @@
 openai
-ollama
-qwen2.5:3b
-fastapi uvicorn
+fastapi
+uvicorn
 pydantic
+piper-tts
+langdetect
